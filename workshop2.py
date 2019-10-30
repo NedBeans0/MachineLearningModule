@@ -107,39 +107,44 @@ y_train = data_train['y'].as_matrix()
 x_test = data_test['x'].as_matrix()
 y_test = data_test['y'].as_matrix()
 
-#Plot the training data
 plt.clf()
 plt.plot(x_train,y_train, 'bo')
 plt.savefig('trainingdata.png')
-#plt.show()
 
-#Create x tilde matrix (data matrix) 
-Xtildetrain = np.column_stack((np.ones(x_train.shape), x_train))
-Xtildetest = np.column_stack((np.ones(x_test.shape), x_test))
+#Construct X matrix
+Xtilde = np.column_stack((np.ones(x_train.shape), x_train))
+Xtilde
 
+#Prediction with hand-picked Betas, in this case 6 and 7
 beta_0 = 7
-beta_1 = 6
+beta_1 = -20
 betatilde = np.array([beta_0, beta_1])
 
-ytest_hat = np.column_stack((np.ones(y_test.shape), y_test))
 
+Xtest_tilde = np.column_stack((np.ones(x_test.shape), x_test))
+ytest_hat = Xtest_tilde.dot(betatilde)
 plt.figure()
 plt.plot(x_test,ytest_hat, 'r')
 plt.plot(x_train,y_train, 'bo')
 plt.plot(x_test,y_test, 'g')
 plt.legend(('predictions', 'training points', 'ground truth'), loc = 'lower right')
 
-print('reached here')
 plt.savefig('regression_randomPrediction.png')
-plt.show()
-plt.close()
+
+#The graph we've created has a rather large error, meaning that although the line does make sense to some extent
+#(it goes through two of the central points) it is still not as good as we'd like it to be. 
+#We can do better. 
+#To assess the quality of our prediction, we compute the error as the difference to the training labels.
 
 yhat = Xtilde.dot(betatilde)
 error = y_train - yhat
-error
+print('Error:')
+print(error) 
 
+#We can then compute an error using the summed square error:
 SSE = error.dot(error) # The scalar product is also implemented with the dot function (no need for transpose)
-SSE
+print('SSE:')
+print(SSE)
 
 def SSE(beta, x, y):
     
@@ -149,6 +154,7 @@ def SSE(beta, x, y):
     SSE = error.dot(error) 
     return SSE
 
+# specify data points for beta0 and beta1 (from - 200 to 200, using 50 uniformly distributed points)
 beta0Array = np.linspace(-200, 200, 50)
 beta1Array = np.linspace(-200, 200, 50)
 
@@ -158,12 +164,11 @@ for i in range(0,50):
     for j in range(0,50):
         beta = np.array([beta0Array[i], beta1Array[j]])
         SSEarray[i,j] =  SSE(beta, x_train, y_train)
-        
-SSEarray
 
-
-
-
+print('SSEArray:')       
+print(SSEarray)
+#The cell ouputs the SSE for every grid position between -200 and 200 for both dimensions. 
+#For a better visualization, we can create a 3D plot. Run the following cell for doing so. 
 
 fig = plt.figure()
 ax = fig.gca(projection='3d')
@@ -187,14 +192,13 @@ index1, index2 = np.unravel_index(minIndex, (50,50))
 beta0 = beta0Array[index1]
 beta1 = beta1Array[index2]
 
-beta0, beta1
-
-beta_0 = -4.0816326
-beta_1 = 12.2448979
+print(beta0)
+print(beta1) 
 betatilde = np.array([beta_0, beta_1])
 
 Xtest_tilde = np.column_stack((np.ones(x_test.shape), x_test))
 ytest_hat = Xtest_tilde.dot(betatilde)
+
 
 plt.figure()
 plt.plot(x_test,ytest_hat, 'r')
@@ -204,5 +208,5 @@ plt.legend(('predictions', 'training points', 'ground truth'), loc = 'lower righ
 
 plt.savefig('regression_randomPrediction.png')
 
-
-
+#After this, gradient descent...
+#For tomorrow!
