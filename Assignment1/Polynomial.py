@@ -29,11 +29,12 @@ def getPolynomialDataMatrix(x, degree):
     the amount of incrementing exponents) is based
     on the degree. 
 
-    For each variable a row : [1, x, x², x³... xⁿ] where n based on the degrees
+    For each variable in x, a row : [1, x, x², x³... xⁿ] where n based on the degrees
     '''
     X = np.ones(x.shape)
     for i in range(1,degree + 1):
         X = np.column_stack((X, x ** i))
+    
 
     return X
 
@@ -42,92 +43,40 @@ def getWeightsForPolynomialFit(x,y,degree):
     X = getPolynomialDataMatrix(x, degree)
 
     XX = X.transpose().dot(X)
-    w = np.linalg.solve(XX, X.transpose().dot(y_train))
+    w = np.linalg.solve(XX, X.transpose().dot(y))
 
     return w
 
 
-
-
-
-def pol_regression(features_train, y_train, degree):
-    #Creates a vandermonde matrix from the x column which essentially gets us the coefficients in the equation
-    coefficients = getPolynomialDataMatrix(features_train, degree)
-    print('Coefficients:');print(coefficients)
-    #Calls function to use least squares solution to get weights
-    
-    #Delete this eventually, it now does the same as theta
-    # theta2 = np.matmul(np.matmul(linalg.pinv(np.matmul(np.transpose(coefficients),coefficients)), np.transpose(coefficients)), y_train)
-
-
-
-    weights = getWeightsForPolynomialFit(features_train, y_train, 4)
-    
-    print('Theta Weight Values:');print(weights)
-    plt.figure()
-    plt.plot(x_train, y_train, 'bo')
-
+def getEquation(x, weights):
+    #Plugs value into the polynomial equation
     yintercept = weights[0]
     print('Y Intercept = ');print(yintercept)
 
     for i in np.arange(1, len(weights)):            
-        yintercept += weights[i] * features_train ** i 
+        yintercept += weights[i] * x ** i 
+    return yintercept
 
 
-    plt.plot(features_train, yintercept)        
-    plt.title('Polynomial Fit: Order ' + str(len(weights)-1))
+def pol_regression(features_train, y_train, degree):
+    #Calls function to use least squares solution to get weights
+    weights = getWeightsForPolynomialFit(features_train, y_train, degree)  
+    line = getEquation(features_train, weights)
+
+    plt.plot(features_train, line)        
+    plt.title('Polynomial Fit')
 
     plt.xlabel('x')
     plt.ylabel('y') 
-    plt.show()
-
-
-
-   
-
-
-
-
-
-    
-    '''
-    plt.figure()
-    #plt.plot(x_test,y_test, 'g')
-    plt.plot(features_train,y_train, 'bo')
-    plt.show()
-    w4 = getWeightsForPolynomialFit(x_train,y_train,4)
-    Xtest4 =getPolynomialDataMatrix(x_train, 4)
-    ytest4 = Xtest4.dot(w4)
-    plt.plot(Xtest4, ytest4, 'r')
-    plt.show()
-    '''
-
-    
+    #plt.show()
+    return weights
 
 
 
 
 
 
-
-
-
-
-
-
-
-
-
-
-    
-
-    #parameters = 
-    ##note - parameters should be 1D numpy array of size n+1 where n is the degree of the polynomial function
-    #return parameters
- 
-pol_regression(x_train, y_train, 4)
-
-def eval_pol_regression(parameters, x, y, degree):
+def eval_pol_regression(x, y):
     '''
 The function takes the parameters computed by the pol_regression function and evaluates its
 performance on the dataset given by the input values x and output values y (again 1D numpy arrays).
@@ -142,6 +91,65 @@ of the polynomial as x-axis of the plot. Interpret your results. Which degree wo
 Are there any degrees of the polynomials where you can clearly identify over and underfitting?
 Explain your conclusions! 
     '''
-    print('stop errror')
+    polydata1 = pd.read_csv('pol_regression.csv')
+    poly2 = polydata1.sample(frac=1)
+
+    train_data = poly2[0:(int(round(len(poly2)*0.7)))]
+    test_data = poly2[(int(round(len(poly2)*0.7))):(len(poly2))]
+
+    x_train = train_data['x'].values
+    y_train = train_data['y'].values
+
+    x_test = test_data['x'].values
+    y_test = test_data['y'].values
+
+    print('X and Y Train')
+    print(x_train)
+    print(y_train)
+
+    print('X and Y Test')
+    print(x_test)
+    print(y_test)
+    rmse_train = np.zeros((9,1))
+    rmse_test = np.zeros((9,1))
+
+    for i in range(1,10):
+        Xtrain2 = getPolynomialDataMatrix(x_train,i)
+        Xtest2 = getPolynomialDataMatrix(x_test,i)
+        if i>=1:
+            w = getWeightsForPolynomialFit(x_train,y_train,i)
+        elif i == 0:
+            w = np.mean(y_train)
+        rmse_train[i-1] = np.sqrt(np.mean((Xtrain2.dot(w)-y_train)**2))
+        rmse_test[i-1] = np.sqrt(np.mean((Xtest2.dot(w)-y_test)**2))
+
+    plt.semilogy(range(1,10),rmse_train)
+    plt.semilogy(range(1,10),rmse_test)
+    plt.legend(('RMSE Training', 'RMSE Testing'))
+    plt.show()
+
+
+
+
+
     #rmse = 
     #return rmse
+
+
+
+plt.plot(x_train, y_train, 'bo') 
+weights1 = pol_regression(x_train, y_train, 1)
+
+line2 = pol_regression(x_train, y_train, 2)
+line3 = pol_regression(x_train, y_train, 3)
+line4 = pol_regression(x_train, y_train, 5)
+line5 = pol_regression(x_train, y_train, 10)
+
+#np.mean(y_train) and plot like ususal 
+
+plt.legend(('points', '$x$', '$x^2$', '$x^3$', '$x^5$','$x^{10}$'), loc = 'lower right')
+plt.show()
+
+eval_pol_regression(x_train, y_train)
+
+#eval_pol_regression(weights1, x_train, y_train, 1)
