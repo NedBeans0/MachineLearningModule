@@ -35,7 +35,6 @@ def getPolynomialDataMatrix(x, degree):
     for i in range(1,degree + 1):
         X = np.column_stack((X, x ** i))
     
-
     return X
 
 def getWeightsForPolynomialFit(x,y,degree):
@@ -48,20 +47,21 @@ def getWeightsForPolynomialFit(x,y,degree):
     return w
 
 
-def getEquation(x, weights):
-    #Plugs value into the polynomial equation
-    yintercept = weights[0]
-    print('Y Intercept = ');print(yintercept)
-
-    for i in np.arange(1, len(weights)):            
-        yintercept += weights[i] * x ** i 
-    return yintercept
 
 
 def pol_regression(features_train, y_train, degree):
     #Calls function to use least squares solution to get weights
     weights = getWeightsForPolynomialFit(features_train, y_train, degree)  
-    line = getEquation(features_train, weights)
+
+    yintercept = weights[0]
+    print('Y Intercept = ');print(yintercept)
+
+
+    for i in np.arange(1, len(weights)):            
+        yintercept += weights[i] * features_train ** i #Arranges the equation β0 + β1x^1 + β2x^2...
+
+    line = yintercept #in this case the variable is no longer just the y-intercept but we've built the 
+                      #rest of the equation up on top of it, so we make a new variable to make this clear
 
     plt.plot(features_train, line)        
     plt.title('Polynomial Fit')
@@ -76,26 +76,17 @@ def pol_regression(features_train, y_train, degree):
 
 
 
-def eval_pol_regression(x, y):
-    '''
-The function takes the parameters computed by the pol_regression function and evaluates its
-performance on the dataset given by the input values x and output values y (again 1D numpy arrays).
-The last argument of the function again specifies the degree of the polynomial. In this function, you
-need to compute the root mean squared error (rmse) of the polynomial given by the parameters
-vector. 
-
-Now you again need to train your polynomial functions with degrees 0, 1, 2, 3, 5 and 10. However,
-this time, split the dataset provided (same as before) into 70% train and 30% test set. Evaluate the
-training set rmse and the test set rmse of all the given degrees. Plot both rmse values using the degree
-of the polynomial as x-axis of the plot. Interpret your results. Which degree would you now choose?
-Are there any degrees of the polynomials where you can clearly identify over and underfitting?
-Explain your conclusions! 
-    '''
+def eval_pol_regression(parameters, x, y, degree):
+    
     polydata1 = pd.read_csv('pol_regression.csv')
     poly2 = polydata1.sample(frac=1)
 
     train_data = poly2[0:(int(round(len(poly2)*0.7)))]
     test_data = poly2[(int(round(len(poly2)*0.7))):(len(poly2))]
+
+    print('Amount of training points:');print(len(train_data))
+    print('Amount of testing points:');print(len(test_data))
+
 
     x_train = train_data['x'].values
     y_train = train_data['y'].values
@@ -113,6 +104,7 @@ Explain your conclusions!
     rmse_train = np.zeros((9,1))
     rmse_test = np.zeros((9,1))
 
+    
     for i in range(1,10):
         Xtrain2 = getPolynomialDataMatrix(x_train,i)
         Xtest2 = getPolynomialDataMatrix(x_test,i)
@@ -120,12 +112,29 @@ Explain your conclusions!
             w = getWeightsForPolynomialFit(x_train,y_train,i)
         elif i == 0:
             w = np.mean(y_train)
-        rmse_train[i-1] = np.sqrt(np.mean((Xtrain2.dot(w)-y_train)**2))
-        rmse_test[i-1] = np.sqrt(np.mean((Xtest2.dot(w)-y_test)**2))
+        rmse_train[i-1] = np.sqrt(np.mean((Xtrain2.dot(w)-y_train)**2)) #Root mean squared error
+        rmse_test[i-1] = np.sqrt(np.mean((Xtest2.dot(w)-y_test)**2)) #Root mean squared error
+    
+    '''
+    Xtrain2 = getPolynomialDataMatrix(x_train,degree)
+    Xtest2 = getPolynomialDataMatrix(x_test,degree)
+    if degree>=1:
+        w = getWeightsForPolynomialFit(x_train,y_train,degree)
+    elif degree == 0:
+        w = np.mean(y_train)
+    rmse_train[degree-1] = np.sqrt(np.mean((Xtrain2.dot(w)-y_train)**2)) #Root mean squared error
+    rmse_test[degree-1] = np.sqrt(np.mean((Xtest2.dot(w)-y_test)**2)) #Root mean squared error
+    '''
+    plt.plot(range(1,10),rmse_train)
+    plt.plot(range(1,10),rmse_test)
+    
+    #plt.plot(rmse_train)
+    #plt.plot(rmse_test)
 
-    plt.semilogy(range(1,10),rmse_train)
-    plt.semilogy(range(1,10),rmse_test)
     plt.legend(('RMSE Training', 'RMSE Testing'))
+    plt.xlabel('Order')
+    plt.ylabel('Error') 
+
     plt.show()
 
 
@@ -135,21 +144,28 @@ Explain your conclusions!
     #rmse = 
     #return rmse
 
+weights = getWeightsForPolynomialFit(x_train, y_train, 1)  
+
+yintercept = weights[0]
 
 
 plt.plot(x_train, y_train, 'bo') 
-weights1 = pol_regression(x_train, y_train, 1)
-
+line0 = plt.axhline(y=yintercept, color='r', linestyle='-')
+line1 = pol_regression(x_train, y_train, 1)
 line2 = pol_regression(x_train, y_train, 2)
 line3 = pol_regression(x_train, y_train, 3)
 line4 = pol_regression(x_train, y_train, 5)
 line5 = pol_regression(x_train, y_train, 10)
 
+
 #np.mean(y_train) and plot like ususal 
 
-plt.legend(('points', '$x$', '$x^2$', '$x^3$', '$x^5$','$x^{10}$'), loc = 'lower right')
+plt.legend(('points', '$x^0$','$x$', '$x^2$', '$x^3$', '$x^5$','$x^{10}$'), loc = 'lower right')
+axes = plt.gca() #x and y
+axes.set_xlim([-5,5]) #as per brief
+
 plt.show()
 
-eval_pol_regression(x_train, y_train)
+eval_pol_regression(line2, x_train, y_train, 5)
 
 #eval_pol_regression(weights1, x_train, y_train, 1)

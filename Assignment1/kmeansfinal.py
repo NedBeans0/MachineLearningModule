@@ -7,45 +7,39 @@ import random
 from copy import deepcopy
 
 
-def compute_euclidean_distance(vec_1,vec_2, k):
-    #return np.linalg.norm(vec_1-vec_2)
-    '''
-    tempDist=np.sum((X-centroids[:,k])**2,axis=1)
-    EuclidianDistance=np.c_[EuclidianDistance,tempDist]
-    C=np.argmin(EuclidianDistance,axis=1)+1
-    '''
-    #Vec 1 will be the dataset and Vec 2 will be the centroid co-ords
+def compute_euclidean_distance(vec_1,vec_2):
+    #Vec_1 = All the data points
+    #Vec_2 = The list of centroid coordinates
+    print('vec 2 length');print(len(vec_2)) #gets k
+    k = (len(vec_2))+1
+    valuelength = len(vec_1)
     
-    vecshape = vec_2.shape[1]
-    #print('vecshape');print(vecshape-1)
+    EuclideanDistance=np.array([]).reshape(valuelength,0) #We want a row of distances for each
+                                                          #data point - each column is the distance
+                                                          #to each centroid in vec_2
+    for k in range(k): #For each centroid
+        Dist=np.sqrt(np.sum((vec_1-vec_2[:,k])**2,axis=1))   #Get euclidean distance from each point to the centroid
+        EuclideanDistance=np.c_[EuclideanDistance,Dist]      #Add a column to the distances array where each row 
+                                                             #is the distance from each co-ord to respective centroid
 
-    #print('k:')
-    #print(k)
-    Dist=np.sum((vec_1-vec_2[:,k])**2,axis=1)
-    return Dist
+    return EuclideanDistance #Return an array with k columns and a m rows where m is the amount of points
 
 
 def initialise_centroids(dataset, k):
-    values=dataset.shape[0] 
-
-    centroids_init=np.array([]).reshape(2,0)
+    values=dataset.shape[0] #Amount of points (300)
+    centroids_init=np.array([]).reshape(2,0) #2 rows. First is for centroid x coords. Second is centroid y coords
 
     for i in range(k): #Makes as many centroids as are passed into the array 
-        rand=random.randint(0,values-1)
-        centroids_init=np.c_[centroids_init,dataset[rand]] 
+        randcoord =random.randint(0,values-1) #Setup for fetching a random index of coordinates
+        centroids_init=np.c_[centroids_init,dataset[randcoord]] #Fill in a column in the array with
+                                                                #co-ordinates from a random index of
+                                                                #the data being explored
     return centroids_init
 
 def kmeans(dataset, k):
-    iterationloops = [] #iterations
-    activationResults = np.array([]).reshape(k,0) #Activation function SSE for each 
-
-    X = dataset.iloc[:, [0, 2]].values #Fetches the columns currently being worked with from the imported dataset
-    #print('X');print(X)
+    X = dataset.iloc[:, [0, 1]].values #Fetches the columns currently being worked with from the imported dataset
     m=X.shape[0] #values - in this case 300
 
-    n_iter=15 #todo possibly replace a fixed value for iterations with a while loop that
-                    #stops when the change in convergence is lower than a certain amount
-    K=k
     centroids=np.array([]).reshape(2,0)
 
     centroids = initialise_centroids(X, k)
@@ -53,24 +47,19 @@ def kmeans(dataset, k):
    
     EuclideanDistance=np.array([]).reshape(m,0) #Empty array of size 300,0 where each element is one list of 
                                                 #euclidean distances
+   
+    initdistance = compute_euclidean_distance(X, centroids)
+    EuclideanDistance=np.c_[EuclideanDistance,initdistance]
 
-    for k in range(k):
-        '''
-        tempDist=np.sum((X-centroids[:,k])**2,axis=1)
-        EuclideanDistance=np.c_[EuclidianDistance,tempDist]
-        
-        EuclideanDistance = compute_euclidean_distance(X, centroids, k)
-        '''
-        initdistance = compute_euclidean_distance(X, centroids, k)
-        #print('Result of InitDistance');print(initdistance)
-        EuclideanDistance=np.c_[EuclideanDistance,initdistance]
-        #print('Result of printing EuclideanDistance');print(EuclideanDistance)
-
+    n_iter=15 #todo possibly replace a fixed value for iterations with a while loop that
+                    #stops when the change in convergence is lower than a certain amount
+    K=k
 
 
     CentroidList=np.argmin(EuclideanDistance,axis=1)+1 #+1 because of zero indexing. After getting the distance from each point
                                             #to each centroid, fetches the smallest distance. Whichever centroid
                                             #this distance came from is now the one assigned to the point
+    print('Centroid List:');print(CentroidList)
     '''
     CentroidList is a list of integers from 1...n where n is the amount of data points.
     The integers range from 1..k and represent to which of the initially randomised clusters each of the
@@ -86,7 +75,7 @@ def kmeans(dataset, k):
 
     for i in range(m):
         OutputDict[CentroidList[i]]=np.c_[OutputDict[CentroidList[i]],X[i]] 
-        #For each of the values in the centroid
+        #For each of the values in the centroid list
         #fetch the actual co-ordinates of each data point associated with each 
         #of the centroids and feed them into a dictionary
         
@@ -108,40 +97,24 @@ def kmeans(dataset, k):
                                                             #coordinates
                                                              
         
-    
-    oldcentroidsl = []
-    newcentroisdsl = []
-
-    #Above will be plotted against each other in the end 
-
-    SquaredError = []
-    SSE = []
 
 
-    for i in range(15): #For a fixed amount of iterations, in this case we have it as 100 since it'll do
-        #iterationloops[i] = i
-     #step 2.a
+    RSSList = []
+    for i in range(8): 
+        
         tempi = i
         
         EuclideanDistance=np.array([]).reshape(m,0)
-        for k in range(K):
-            initdistance = compute_euclidean_distance(X, centroids,k)
-            EuclideanDistance=np.c_[EuclideanDistance,initdistance]
-            
-            #print(EuclideanDistance)
+        #for k in range(K):
+        initdistance = compute_euclidean_distance(X, centroids)
+        #EuclideanDistance=np.c_[EuclideanDistance,initdistance]
+        EuclideanDistance = initdistance
+        RSS1 = EuclideanDistance
 
         CentroidList=np.argmin(EuclideanDistance,axis=1)+1
         oldcentroids = centroids
+        
 
-        print('Old Centroids');print(oldcentroids)
-        oldcentroidsl.append(oldcentroids)
-        print('Old Centroids list contents')
-        print(oldcentroidsl)
-        #SquaredError = SquaredError - centroids
-        #rint('Squared Error:');print(SquaredError)
-
-
-     #step 2.b
         OutputDict={}
         '''
         This is literally just repeating the steps from earlier until iterations are completed
@@ -152,6 +125,7 @@ def kmeans(dataset, k):
         '''
         for k in range(K):
             OutputDict[k+1]=np.array([]).reshape(2,0)
+        #print('Old Centroids 2');print(oldcentroids)
 
         for i in range(m):
             '''
@@ -160,39 +134,38 @@ def kmeans(dataset, k):
             #of the centroids and feed them into a dictionary
             '''
             OutputDict[CentroidList[i]]=np.c_[OutputDict[CentroidList[i]],X[i]]
-            #print('Each iteration p')
-            #print(np.c_[OutputDict[CentroidList[i]],X[i]])
 
-     
+
         for k in range(K):
             OutputDict[k+1]=OutputDict[k+1].T
-    
+
+        #This is where the centroids change
         for k in range(K):
             centroids[:,k]=np.mean(OutputDict[k+1],axis=0)
-            #print('Mean iterated ');print(i);print('times')
         
-        #print('Old Centroids2');print(tempold)
-        #print('New Centroids');print(centroids)
-        newcentroisdsl.append(centroids)
-        #print('Old - New:');print(centroids-oldcentroids)
-
-
+        RSS2 = compute_euclidean_distance(X, centroids)
+        RSSTru = RSS1-RSS2
+        RSSList.append(RSSTru)
 
         Output=OutputDict
-        #print('Output:')
-        #print(Output)
 
-    #print('Squared Error:');print(SquaredError)        
-    #print('Ultimate centroids list');print(centroidultimatelist)
-    #print('Old centroids');print(oldcentroidsl)
-    #print('New centroids');print(newcentroisdsl)
+    #print('RSSList');print(RSSList)
+   
+    #RSS1 = RSSList[0]
+    print('diff1')
+
+
+
+
+
+
     color=['red','blue', 'green']
     labels=['Cluster 1','Cluster 2', 'Cluster 3']
     for k in range(K):
         plt.scatter(Output[k+1][:,0],Output[k+1][:,1],c=color[k],label=labels[k])
     plt.scatter(centroids[0,:],centroids[1,:],s=150,c='black',label='Centroids', marker='X')
     plt.xlabel('Height')
-    plt.ylabel('Leg Length')
+    plt.ylabel('Tail Length')
     plt.legend()
     plt.show()
 
@@ -206,4 +179,3 @@ nose = dataset['nose circumference']
 k = 3
 kmeans(dataset, k)
 
-    
