@@ -10,8 +10,10 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.datasets import make_classification
 from sklearn.metrics import confusion_matrix
 from sklearn.metrics import accuracy_score
+from sklearn.model_selection import KFold
 from matplotlib import cm 
 from matplotlib.ticker import LinearLocator, FormatStrFormatter
+from sklearn.model_selection import cross_val_score
 from scipy import linalg
 from collections import OrderedDict
 
@@ -21,8 +23,8 @@ dataset = pd.read_csv('nucleardata.csv')
 #Y = The status column. Dependent variable to predict. Changed to categorical data 0 = Normal, 1 = Abnormal
 x = pd.DataFrame(dataset)
 x = x.drop('Status', 1)
-
 y = pd.DataFrame(dataset, columns=['Status'])
+
 '''
 categoricalConv = {'Normal':0,'Abnormal':1}
 y = y.replace(categoricalConv)
@@ -37,9 +39,9 @@ scaler.fit(x_train)
 x_train = scaler.transform(x_train)
 x_test = scaler.transform(x_test)
 
-
+'''
 #Training a Multi Layer Perceptron
-mlp = MLPClassifier(hidden_layer_sizes=(500, 500), activation='logistic', max_iter=10000)
+mlp = MLPClassifier(hidden_layer_sizes=(500, 500), activation='logistic', max_iter=1000)
 setattr(mlp, "out_activation_", "logistic")
 
 mlp.fit(x_train, y_train)
@@ -49,9 +51,6 @@ print('ANN Classifications:');print(mlp_predictions)
 #Evaluating the Multi Layer Perceptron
 print("\nConfusion Matrix for ANN: \n", confusion_matrix(y_test, mlp_predictions))
 print("Accuracy score for ANN: ", accuracy_score(y_test, mlp_predictions))
-
-
-
 
 
 
@@ -75,31 +74,34 @@ print('RFC Classifications w/ 500:');print(rfc_predictions2)
 print("\nConfusion Matrix for RFC2: \n", confusion_matrix(y_test, rfc_predictions2))
 print("Accuracy score for RFC2: ", accuracy_score(y_test, rfc_predictions2))
 
+'''
+
+# Evaluation with K-Fold Cross-Validation (Where K=10)
+k = 10 
+kf = KFold(n_splits=k, shuffle=True)
 
 
+mlp50 = MLPClassifier(hidden_layer_sizes=(50, 50), activation='logistic', max_iter=1000)
+setattr(mlp50, "out_activation_", "logistic")
+mlp50cv = cross_val_score(mlp50, x, y, cv=k, scoring='accuracy')
+print('CROSS VAL SCORE FOR 50');print(mlp50cv)
+mpl50mean = np.mean(mlp50cv)
+print('MEAN OF ANN CV FOR 50:');print(mpl50mean)
 
 
-
-
-
-
-
-
-
+mlp500 = MLPClassifier(hidden_layer_sizes=(500, 500), activation='logistic', max_iter=1000)
+setattr(mlp50, "out_activation_", "logistic")
+mlp500cv = cross_val_score(mlp500, x, y, cv=k, scoring='accuracy')
+print('CROSS VAL SCORE FOR 50');print(mlp50cv)
+mpl500mean = np.mean(mlp500cv)
+print('MEAN OF ANN CV FOR 500:');print(mpl500mean)
 
 '''
-testlength = len(x_test) #Could also be y_test we just want the length of the testing set (100) in this case
-
-#For evaluation purposes let's turn it into a numpy array
-mlphits = 0
-y_testarr = y_test.to_numpy() 
-for i in range(testlength):
-    if mlp_predictions[i] == y_testarr[i]:
-        mlphits += 1
-
-mlp_error_rate = (mlphits/testlength) 
-print('ANN ACCURACY:');print(mlp_error_rate)
+mlp1000 = MLPClassifier(hidden_layer_sizes=(1000, 1000), activation='logistic', max_iter=1000)
+setattr(mlp1000, "out_activation_", "logistic")
+print('CROSS VAL SCORE FOR 50');print(cross_val_score(mlp1000, x, y, cv=k, scoring='accuracy'))
 '''
+
 
 
 

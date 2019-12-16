@@ -131,14 +131,21 @@ print('VibeMin');print(vibemin)
 
 print('PowerMax');print(powermax)
 print('PressMax');print(pressuremax)
-'''
+
 print('VibeMax');print(vibemax)
+'''
+
+summary = dataset.describe()
+print(summary)
 
 
 
 df = pd.DataFrame(dataset, columns=['Status','Vibration_sensor_1'])
 df2 = pd.DataFrame(dataset, columns=['Status','Vibration_sensor_2'])
 
+
+#Remove Whitespace from the Headers
+#if whitespace remove
 
 #Boxplot
 df.boxplot(by='Status')
