@@ -32,6 +32,7 @@ y = y.replace(categoricalConv)
 #Split randomly into 90% Training Data and 10% Testing Data
 x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.1, train_size=0.9) #test_size = 0.1 equivalent to '=10% of the data' 
 
+print('BEFORE SCALING X_TEST: ',x_train)
 
 #Normalising
 scaler = StandardScaler()
@@ -39,7 +40,9 @@ scaler.fit(x_train)
 x_train = scaler.transform(x_train)
 x_test = scaler.transform(x_test)
 
-'''
+print('AFTER SCALING X_TEST: ',x_train)
+
+
 #Training a Multi Layer Perceptron
 mlp = MLPClassifier(hidden_layer_sizes=(500, 500), activation='logistic', max_iter=1000)
 setattr(mlp, "out_activation_", "logistic")
@@ -74,8 +77,15 @@ print('RFC Classifications w/ 500:');print(rfc_predictions2)
 print("\nConfusion Matrix for RFC2: \n", confusion_matrix(y_test, rfc_predictions2))
 print("Accuracy score for RFC2: ", accuracy_score(y_test, rfc_predictions2))
 
-'''
 
+
+
+
+
+
+
+
+'''
 # Evaluation with K-Fold Cross-Validation (Where K=10)
 k = 10 
 kf = KFold(n_splits=k, shuffle=True)
@@ -96,7 +106,7 @@ print('CROSS VAL SCORE FOR 50');print(mlp50cv)
 mpl500mean = np.mean(mlp500cv)
 print('MEAN OF ANN CV FOR 500:');print(mpl500mean)
 
-'''
+
 mlp1000 = MLPClassifier(hidden_layer_sizes=(1000, 1000), activation='logistic', max_iter=1000)
 setattr(mlp1000, "out_activation_", "logistic")
 print('CROSS VAL SCORE FOR 50');print(cross_val_score(mlp1000, x, y, cv=k, scoring='accuracy'))

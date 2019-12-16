@@ -24,10 +24,7 @@ x = pd.DataFrame(dataset)
 x = x.drop('Status', 1)
 
 y = pd.DataFrame(dataset, columns=['Status'])
-'''
-categoricalConv = {'Normal':0,'Abnormal':1}
-y = y.replace(categoricalConv)
-'''
+
 #Split randomly into 90% Training Data and 10% Testing Data
 x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.1, train_size=0.9) #test_size = 0.1 equivalent to '=10% of the data' 
 
@@ -38,45 +35,40 @@ scaler.fit(x_train)
 x_train = scaler.transform(x_train)
 x_test = scaler.transform(x_test)
 
-epochs = [10, 50, 100, 250, 500, 750, 1000, 2000, 5000, 10000]
-epochsize = len(epochs)
+trees = [10, 50, 100, 250, 500, 750, 1000, 2000, 5000]
+treessize = len(trees)
 accuracylist = [] 
-for i in range(epochsize):
-    #Training a Multi Layer Perceptron
-    mlp = MLPClassifier(hidden_layer_sizes=(500, 500), activation='logistic', max_iter=epochs[i])
-    setattr(mlp, "out_activation_", "logistic")
+accuracylist2 = []
 
-    mlp.fit(x_train, y_train)
-    mlp_predictions = mlp.predict(x_test)
-    print('ANN Classifications:');print(mlp_predictions) 
-    iteraccuracy = accuracy_score(y_test, mlp_predictions)
+for i in range(treessize):
+    #Training a Random Forest Classifier 
+    rfc = RandomForestClassifier(n_estimators=trees[i], min_samples_leaf=5)
+    rfc.fit(x_train, y_train)
+    rfc_predictions = rfc.predict(x_test)
+    print('Tree Classifications:');print(rfc_predictions) 
+    iteraccuracy = accuracy_score(y_test, rfc_predictions)
     accuracylist.append(iteraccuracy)
 
 print('ACCURACY LIST:');print(accuracylist)
-plt.plot(epochs, accuracylist)
+plt.plot(trees, accuracylist)
+
+for i in range(treessize):
+    #Training a Random Forest Classifier 
+    rfc = RandomForestClassifier(n_estimators=trees[i], min_samples_leaf=50)
+    rfc.fit(x_train, y_train)
+    rfc_predictions = rfc.predict(x_test)
+    print('Tree Classifications:');print(rfc_predictions) 
+    iteraccuracy = accuracy_score(y_test, rfc_predictions)
+    accuracylist2.append(iteraccuracy)
+plt.plot(trees, accuracylist2)
+
+
 axes = plt.gca()
 axes.set_ylim([0,1])
 
-
-plt.title("ANN: Epochs and Accuracies")
-plt.xlabel("Epochs")
+plt.title("RFC: Tree Counts and Accuracies")
+plt.xlabel("Tree Counts")
 plt.ylabel("Accuracies")
+plt.legend(('5 Min Split', '50 Min Split'), loc = 'lower right')
 
 plt.show()
-
-
-
-
-
-
-
-'''
-#Training a Multi Layer Perceptron
-mlp = MLPClassifier(hidden_layer_sizes=(500, 500), activation='logistic', max_iter=1000)
-setattr(mlp, "out_activation_", "logistic")
-
-mlp.fit(x_train, y_train)
-mlp_predictions = mlp.predict(x_test)
-print('ANN Classifications:');print(mlp_predictions) 
-iteraccuracy = accuracy_score(y_test, mlp_predictions))
-'''
