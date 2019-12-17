@@ -21,7 +21,7 @@ from scipy import linalg
 from collections import OrderedDict
 
 def KFoldCV(layersizes, x, y, k):
-    mlp = MLPClassifier(hidden_layer_sizes=(layersizes), activation='logistic')
+    mlp = MLPClassifier(hidden_layer_sizes=(layersizes,layersizes), activation='logistic')
     setattr(mlp, "out_activation_", "logistic")
     mlpcv = cross_val_score(mlp, x, y, cv=k,scoring='accuracy')
     print('CROSS VAL SCORE FOR ',layersizes, ':');print(mlpcv)
@@ -43,5 +43,5 @@ k=10
 # Evaluation with K-Fold Cross-Validation (Where K=10)
 KFoldCV(50, x, y, k)
 KFoldCV(500, x, y, k)
-KFoldCV(1000, x, y, k)
+#KFoldCV(1000, x, y, k)
 

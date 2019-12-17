@@ -60,9 +60,8 @@ for i in range(treessize):
     print('Tree Classifications:');print(rfc_predictions) 
     iteraccuracy = accuracy_score(y_test, rfc_predictions)
     accuracylist2.append(iteraccuracy)
+
 plt.plot(trees, accuracylist2)
-
-
 axes = plt.gca()
 axes.set_ylim([0,1])
 
