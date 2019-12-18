@@ -44,19 +44,20 @@ print('AFTER SCALING X_TEST: ',x_train)
 
 
 #Training a Multi Layer Perceptron
-mlp = MLPClassifier(hidden_layer_sizes=(500, 500), activation='logistic', max_iter=1000)
+mlp = MLPClassifier(hidden_layer_sizes=(500, 500), activation='logistic')
 setattr(mlp, "out_activation_", "logistic")
-
 mlp.fit(x_train, y_train)
+
+#Predicting Values in Y_Test 
 mlp_predictions = mlp.predict(x_test)
 print('ANN Classifications:');print(mlp_predictions) 
 
-#Evaluating the Multi Layer Perceptron
+#Evaluating the Multi Layer Perceptron's Performance
 print("\nConfusion Matrix for ANN: \n", confusion_matrix(y_test, mlp_predictions))
 print("Accuracy score for ANN: ", accuracy_score(y_test, mlp_predictions))
 
 
-
+'''
 #Training a Random Forest Classifier 
 rfc = RandomForestClassifier(n_estimators=1000, min_samples_leaf=5)
 rfc.fit(x_train, y_train)
@@ -77,7 +78,7 @@ print('RFC Classifications w/ 500:');print(rfc_predictions2)
 print("\nConfusion Matrix for RFC2: \n", confusion_matrix(y_test, rfc_predictions2))
 print("Accuracy score for RFC2: ", accuracy_score(y_test, rfc_predictions2))
 
-
+'''
 
 
 

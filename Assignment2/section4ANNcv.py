@@ -23,7 +23,7 @@ from collections import OrderedDict
 def KFoldCV(layersizes, x, y, k):
     mlp = MLPClassifier(hidden_layer_sizes=(layersizes,layersizes), activation='logistic')
     setattr(mlp, "out_activation_", "logistic")
-    mlpcv = cross_val_score(mlp, x, y, cv=k,scoring='accuracy')
+    mlpcv = cross_val_score(mlp, x, y, cv=k,scoring='accuracy',n_jobs=-1)
     print('CROSS VAL SCORE FOR ',layersizes, ':');print(mlpcv)
     mplmean = np.mean(mlpcv)
     mplvar = np.std(mlpcv)

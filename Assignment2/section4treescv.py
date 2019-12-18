@@ -22,7 +22,7 @@ from collections import OrderedDict
 
 def KFoldCV(treecount, x, y, k):
     rfc20 = RandomForestClassifier(n_estimators=treecount, min_samples_leaf=5)
-    rfc20cv = cross_val_score(rfc20, x, y, cv=k,scoring='accuracy')
+    rfc20cv = cross_val_score(rfc20, x, y, cv=k,scoring='accuracy', n_jobs=-1)
     print('CROSS VAL SCORE FOR ',treecount,':');print(rfc20cv)
     rfc20mean = np.mean(rfc20cv)
     rfc20var = np.std(rfc20cv)
