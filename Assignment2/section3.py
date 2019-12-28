@@ -57,28 +57,25 @@ print("\nConfusion Matrix for ANN: \n", confusion_matrix(y_test, mlp_predictions
 print("Accuracy score for ANN: ", accuracy_score(y_test, mlp_predictions))
 
 
-'''
+
 #Training a Random Forest Classifier 
 rfc = RandomForestClassifier(n_estimators=1000, min_samples_leaf=5)
 rfc.fit(x_train, y_train)
 rfc_predictions = rfc.predict(x_test)
-print('RFC Classifications w/ 5:');print(rfc_predictions) 
+print('RFC Classifications w/ 5 Min Leaves:');print(rfc_predictions) 
 #Evaluating the 5 Minimum Node RFC
 print("\nConfusion Matrix for RFC1: \n", confusion_matrix(y_test, rfc_predictions))
 print("Accuracy score for RFC1: ", accuracy_score(y_test, rfc_predictions))
 
-
-
-
 rfc2 = RandomForestClassifier(n_estimators=1000, min_samples_leaf=50)
 rfc2.fit(x_train, y_train)
 rfc_predictions2 = rfc2.predict(x_test)
-print('RFC Classifications w/ 500:');print(rfc_predictions2) 
+print('RFC Classifications w/ 50 Min Leaves:');print(rfc_predictions2) 
 #Evaluating the 50 Minimum Node RFC
 print("\nConfusion Matrix for RFC2: \n", confusion_matrix(y_test, rfc_predictions2))
 print("Accuracy score for RFC2: ", accuracy_score(y_test, rfc_predictions2))
 
-'''
+
 
 
 

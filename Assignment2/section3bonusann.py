@@ -44,6 +44,7 @@ accuracylist = []
 for i in range(epochsize):
     #Training a Multi Layer Perceptron
     mlp = MLPClassifier(hidden_layer_sizes=(500, 500), activation='logistic', max_iter=epochs[i], random_state=1)
+    print('Current Epochs: ');print(epochs[i])
     setattr(mlp, "out_activation_", "logistic")
 
     mlp.fit(x_train, y_train)

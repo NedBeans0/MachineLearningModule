@@ -40,8 +40,9 @@ y = pd.DataFrame(dataset, columns=['Status'])
 
 
 # Evaluation with K-Fold Cross-Validation (Where K=10)
-KFoldCV(20,x,y,10)
-KFoldCV(500,x,y,10)
-KFoldCV(10000,x,y,10)
+k=10 
+KFoldCV(20,x,y,k)
+KFoldCV(500,x,y,k)
+KFoldCV(10000,x,y,k)
 
 

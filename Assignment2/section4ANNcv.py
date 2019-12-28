@@ -23,12 +23,14 @@ from collections import OrderedDict
 def KFoldCV(layersizes, x, y, k):
     mlp = MLPClassifier(hidden_layer_sizes=(layersizes,layersizes), activation='logistic')
     setattr(mlp, "out_activation_", "logistic")
-    mlpcv = cross_val_score(mlp, x, y, cv=k,scoring='accuracy',n_jobs=-1)
+    
+    #10 folds. Accuracy as CV score measurement. n_jobs to use all CPU cores.
+    mlpcv = cross_val_score(mlp, x, y, cv=k,scoring='accuracy',n_jobs=-1) 
     print('CROSS VAL SCORE FOR ',layersizes, ':');print(mlpcv)
-    mplmean = np.mean(mlpcv)
-    mplvar = np.std(mlpcv)
+    mplmean = np.mean(mlpcv) #Mean of each of the K accuracies.
+    mplstd = np.std(mlpcv)   #Std. Dev of each of the K accuracies.
     print('MEAN OF ANN CV FOR ', layersizes, ':');print(mplmean)
-    print('STD.DEV OF ANN CV FOR ', layersizes, ':');print(mplvar, '\n\n')
+    print('STD.DEV OF ANN CV FOR ', layersizes, ':');print(mplstd, '\n\n')
 
 dataset = pd.read_csv('nucleardata.csv')
 dataset = shuffle(dataset)
@@ -38,10 +40,9 @@ dataset = shuffle(dataset)
 x = pd.DataFrame(dataset)
 x = x.drop('Status', 1)
 y = pd.DataFrame(dataset, columns=['Status'])
-k=10
-
 # Evaluation with K-Fold Cross-Validation (Where K=10)
+k=10
 KFoldCV(50, x, y, k)
 KFoldCV(500, x, y, k)
-#KFoldCV(1000, x, y, k)
+KFoldCV(1000, x, y, k)
 
