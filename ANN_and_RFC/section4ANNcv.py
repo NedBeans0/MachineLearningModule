@@ -35,7 +35,7 @@ def KFoldCV(layersizes, x, y, k):
 dataset = pd.read_csv('nucleardata.csv')
 dataset = shuffle(dataset)
 
-#X = All the data without the Status Column. Independent variables.
+#X = All the data without the Status Column. Independ ent variables.
 #Y = The status column. Dependent variable to predict. Changed to categorical data 0 = Normal, 1 = Abnormal
 x = pd.DataFrame(dataset)
 x = x.drop('Status', 1)

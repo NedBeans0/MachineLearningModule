@@ -208,5 +208,3 @@ plt.legend(('predictions', 'training points', 'ground truth'), loc = 'lower righ
 
 plt.savefig('regression_randomPrediction.png')
 
-#After this, gradient descent...
-#For tomorrow!
