@@ -8,10 +8,7 @@ from collections import OrderedDict
 
 '''
 pol_regression.csv is a one-dimensional dataset with inputs x (1 input dimension) and outputs y (1 output dimension).
-
-
 '''
-
 data_train = pd.DataFrame.from_csv('pol_regression.csv')
 data_train.sort_values('x', axis = 0, ascending = True, inplace = True, na_position = 'last')
 x_train = data_train['x'].as_matrix()
